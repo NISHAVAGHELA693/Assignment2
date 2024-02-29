@@ -1,9 +1,11 @@
-import React, { Component } from 'react'
-import { Text, StyleSheet, View, ImageBackground, TouchableOpacity } from 'react-native'
-import { BG1, email, password, userIcon,menu,Notification,Bin} from './assests';
+import React, { Component } from 'react';
+import { Text, StyleSheet, View, ImageBackground, TouchableOpacity } from 'react-native';
+import { BG1, email, password, userIcon } from './assests';
 import Scale from './Scale';
 import TextInputFields from './TextInput';
 import Header from './Header';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 export default class txtForm extends Component {
     constructor() {
         super();
@@ -16,15 +18,19 @@ export default class txtForm extends Component {
             nameError: null,
         };
     }
+
     handleEmailChange = (text) => {
         this.setState({ email: text, emailError: null });
     };
+
     handleNameChange = (text) => {
-        this.setState({ name: text, nameErrorError: null });
+        this.setState({ name: text, nameError: null });
     };
+
     handlePasswordChange = (text) => {
         this.setState({ password: text, passwordError: null });
     };
+
     validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
@@ -35,13 +41,15 @@ export default class txtForm extends Component {
         return passwordRegex.test(password);
     };
 
-    handleCreateAccount = () => {
+    handleCreateAccount = async () => {
         const { name, email, password } = this.state;
         this.setState({ emailError: null, passwordError: null, nameError: null });
+
         if (!name.trim()) {
             this.setState({ nameError: "Name is required" });
             return;
         }
+
         if (!this.validateEmail(email)) {
             this.setState({ emailError: "Invalid email address" });
             return;
@@ -51,57 +59,66 @@ export default class txtForm extends Component {
             this.setState({ passwordError: "Invalid password. It should be at least 8 characters long." });
             return;
         }
-        console.log("Account created successfully");
+        try {
+            await AsyncStorage.setItem('email', email);
+            await AsyncStorage.setItem('password', password);
+            alert("Account created successfully");
+            this.props.navigation.navigate('HomeScreen')
+
+        } catch (error) {
+            console.error("Error saving data to local storage:", error);
+        }
     };
+
     render() {
         return (
-            <ImageBackground source={BG1} style={styles.ImageBackground}>
-                <View style={styles.container}>
-                    <View style={styles.inputContainer}>
-                        <Text style={styles.txt}>SignUp Your Account</Text>
-                        <TextInputFields
-                            placeholder="Enter Your Name"
-                            autoCapitalize="none"
-                            iconSource={userIcon}
-                            value={this.state.name}
-                            onChangeText={this.handleNameChange}
-                        />
-                        {this.state.nameError && <Text style={styles.errorText}>{this.state.nameError}</Text>}
-                        <TextInputFields
-                            placeholder="Email"
-                            autoCapitalize="none"
-                            iconSource={email}
-                            value={this.state.email}
-                            onChangeText={this.handleEmailChange}
-                        />
-                        {this.state.emailError && <Text style={styles.errorText}>{this.state.emailError}</Text>}
-                        <TextInputFields
-                            placeholder="Password"
-                            autoCapitalize="none"
-                            iconSource={password}
-                            value={this.state.password}
-                            onChangeText={this.handlePasswordChange}
-                            secureTxt={true}
-                        />
-                        {this.state.passwordError && <Text style={styles.errorText}>{this.state.passwordError}</Text>}
-                        <View style={styles.LoginUpView}>
-                            <Text style={styles.txt}>Already have an account? </Text>
-                            <TouchableOpacity
-                                onPress={() => this.props.navigation.navigate('LoginForm')}>
-                                <Text>Login</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <View style={{ alignItems: "center", marginTop: Scale(50) }}>
-                            <TouchableOpacity style={styles.ACCOUNT} onPress={this.handleCreateAccount}>
-                                <Text style={styles.btnTxt}>
-                                    CREATE ACCOUNT</Text>
-                            </TouchableOpacity>
+            <>
+                <Header />
+                <ImageBackground source={BG1} style={styles.ImageBackground}>
+                    <View style={styles.container}>
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.txt}>SignUp Your Account</Text>
+                            <TextInputFields
+                                placeholder="Enter Your Name"
+                                autoCapitalize="none"
+                                iconSource={userIcon}
+                                value={this.state.name}
+                                onChangeText={this.handleNameChange}
+                            />
+                            {this.state.nameError && <Text style={styles.errorText}>{this.state.nameError}</Text>}
+                            <TextInputFields
+                                placeholder="Email"
+                                autoCapitalize="none"
+                                iconSource={email}
+                                value={this.state.email}
+                                onChangeText={this.handleEmailChange}
+                            />
+                            {this.state.emailError && <Text style={styles.errorText}>{this.state.emailError}</Text>}
+                            <TextInputFields
+                                placeholder="Password"
+                                autoCapitalize="none"
+                                iconSource={password}
+                                value={this.state.password}
+                                onChangeText={this.handlePasswordChange}
+                                secureTxt={true}
+                            />
+                            {this.state.passwordError && <Text style={styles.errorText}>{this.state.passwordError}</Text>}
+                            <View style={styles.LoginUpView}>
+                                <Text style={styles.txt}>Already have an account? </Text>
+                                <TouchableOpacity onPress={() => this.props.navigation.navigate('LoginForm')}>
+                                    <Text>Login</Text>
+                                </TouchableOpacity>
+                            </View>
+                            <View style={{ alignItems: "center", marginTop: Scale(50) }}>
+                                <TouchableOpacity style={styles.ACCOUNT} onPress={this.handleCreateAccount}>
+                                    <Text style={styles.btnTxt}>CREATE ACCOUNT</Text>
+                                </TouchableOpacity>
+                            </View>
                         </View>
                     </View>
-
-                </View>
-            </ImageBackground>
-        )
+                </ImageBackground>
+            </>
+        );
     }
 }
 
@@ -114,10 +131,9 @@ const styles = StyleSheet.create({
     },
     container: {
         width: Scale(345),
-        justifyContent: "center",
-        alignItems: "center",
         alignSelf: "center",
         borderRadius: Scale(5),
+        marginBottom: Scale(50)
     },
     ACCOUNT: {
         width: Scale(144),
@@ -130,8 +146,7 @@ const styles = StyleSheet.create({
     inputContainer: {
         backgroundColor: "#F4F5F7",
         width: Scale(345),
-        marginTop: Scale(30),
-        padding: Scale(20)
+        padding: Scale(30)
     },
     txt: {
         color: "#8898AA",
@@ -151,5 +166,5 @@ const styles = StyleSheet.create({
         fontWeight: "700",
         fontSize: Scale(14)
     }
+});
 
-})

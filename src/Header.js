@@ -1,60 +1,52 @@
 import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
+import { View, Text, Image, StyleSheet,ImageBackground,TouchableOpacity} from "react-native";
 import Scale from "./Scale";
+import { BG1, Bin, Notification,menu} from './assests';
 
-const Header = (props) => {
-    const {
-        logoIcon,
-        title,
-        notificationIcon,
-        deleteIcon,
-        customStyle,
-    } = props;
-
+const Header = () => {
     return (
-        <View style={[styles.container, customStyle && customStyle]}>
-            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-            <Image source={logoIcon} style={styles.logoIcon} />
-            <Text style={styles.titleTxt}>{title}</Text>
-            </View>
-            <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
-            <Image source={notificationIcon} style={styles.notificationIcon} />
-            <Image source={deleteIcon} style={styles.deleteIcon} />
+        <View>
+            <ImageBackground source={BG1}>
+                <View style={styles.HeaderView}>
+                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                        <TouchableOpacity>
+                            <Image source={menu} style={styles.menu} />
+                        </TouchableOpacity>
+                        <Text style={{ fontSize: 16, fontWeight: "700", color: "#ffff" }}> profile </Text>
+                    </View>
+                    <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center" }}>
+                        <Image source={Notification} style={{ width: Scale(24), height: Scale(24) }} />
+                        <Image source={Bin} style={styles.Bin} />
+                    </View>
+                </View>
+            </ImageBackground>
         </View>
-        </View>
-    );
+    )
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flexDirection: "row",
-        alignItems: "center",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: 10,
-        backgroundColor: "#0012",
-        marginTop: Scale(40),
-        paddingHorizontal:Scale(20)
-    },
-    logoIcon: {
-        width: 16,
-        height: 20,
-    },
-    notificationIcon:{
-        width: 16,
-        height: 20,
-        marginRight:Scale(20)
-    },
-    deleteIcon:{
-        width: 16,
-        height: 20,
-    },
-    titleTxt:{
-         fontSize: 16, 
-         fontWeight: "700",
-          color: "#ffff",
-          marginLeft:Scale(20) 
-        }
+        HeaderView: {
+            justifyContent: "space-between",
+            marginTop: 35,
+            marginHorizontal: 20,
+            flexDirection: "row"
+        },
+        menu: {
+            width: Scale(24),
+            height: Scale(24),
+            marginRight: Scale(10),
+            alignSelf: "center",
+            tintColor: "#000"
+        },
+        Bin: {
+            width: Scale(24),
+            height: Scale(24),
+            marginLeft: Scale(10)
+        },
+        blueLogo: {
+            width: Scale(109),
+            height: Scale(32)
+        },
 });
 
 export default Header;
